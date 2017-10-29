@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>slide mobile touchSwipe插件</title>
+    <style>
+        body,html,div,p,a,ul,li{padding:0;margin:0; list-style: none}
+        .demoSlider{ position: relative; overflow:hidden;max-width:500px;}
+        .imgSlide{position: relative; -webkit-transition: left ease-in 0.5s; width:10000px; left:0;}
+        .imgSlide li{position:relative;float:left;max-width:500px;}
+        .imgSlide li img{display: block;width: 100%}
+        .imgSlide li p{ position: absolute; width:98%;height:30px;padding:0 1%;bottom:0;left:0; background: rgba(0,0,0,.7);color:#fff; line-height: 30px;}
+        #lastImg{ position: absolute;left:10px; top: 50%; margin-top: -25px}
+        #nextImg{ position: absolute;right:30px; top: 50%;margin-top: -25px}
+        #lastImg:after {border: 10px solid transparent;border-right: 10px solid rgba(220,220,220,.9);width: 0;height: 0; left:0;top:0;position: absolute; content: ' ';cursor: pointer  }
+        #nextImg:after {border: 10px solid transparent;border-left: 10px solid rgba(220,220,220,.9);width: 0;height: 0;left:0;top:0;position: absolute; content: ' ' ;cursor: pointer }
+        .dot{ position: absolute;width:100%; bottom: 30px; text-align: center}
+        .dot li{display: inline-block;width:14px; height:14px;background: rgba(255,255,255,0.6);border-radius: 50%; margin: 0 10px;}
+        .dot li.on{ background: rgba(255,255,255,1)}
+    </style>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.touchSwipe.min.js"></script>
+</head>
+<body>
+
+    <div class="demoSlider">
+        <ul class="imgSlide"></ul>
+        <ul class="dot"></ul>
+    </div>
+
+
+<script>
+$(function(){
+    $.ajax({
+        type:"get",
+        dataType:"json",
+        url:"http://192.168.1.102:8080/test/slider/js/json1.json",
+        success:function(dataSlide){
+            slideFn('demoSlider','imgSlide',dataSlide);
+        },
+	    error:function(){
+            alert('Data request has problem!');
+        }
+    });//data get
+
+
+    var slideFn = function(demo,imgUl,data){
+        var str ='';
+        var dot ='';
+        var demo = $('.'+demo);
+        var imgUl = $('.'+imgUl);
+        for(var i=0;i<data.length;i++){
+            str += '<li><img src='+data[i].url+'><p>'+data[i].title.title1+'</p></li>';
+            dot += '<li></li>';
+        }
+
+        imgUl.html(str);
+        imgUl.after('<span id="lastImg"></span><span id="nextImg"></span>');
+        demo.children(".dot").html(dot);
+        var liWidth = imgUl.children().width();
+        imgUl.css("width",10000);
+        demo.css('width',$(window).width());//width setting,maybe need change
+        $('.imgSlide li').css('width',demo.width());
+        clickFn('imgSlide','lastImg','nextImg','dot');
+    };//creat and set elements
+
+    var clickFn = function(imgSlide2,prev,next,dot){
+        var imgSlide = $('.'+imgSlide2);
+        var liWidth =imgSlide.children().width();
+        var liEach =$('.'+imgSlide2+' li');
+        var dot = $('.'+dot);
+        var dotLi = dot.children();
+        var next = $('#'+next);
+        var prev = $('#'+prev);
+        dotLi.eq(0).addClass('on');
+        imgSlide.css('left',0);
+
+        for(var i=0;i<dotLi.length;i++){
+            dotLi.bind('click',function(){
+                i=$(this).index();
+                var leftValue = -i*liWidth;
+                if(i<dotLi.length){
+                    imgSlide.css('left',leftValue);
+                }else if(i>=dotLi.length){
+                    imgSlide.css('left',0);
+                }
+                dotLi.removeClass('on').eq(i).addClass('on');
+            });
+        };//click
+
+        var nextFn = function () {
+            var leftValue = imgSlide.offset().left;
+            if(leftValue<=-(dotLi.length-1)*liWidth){
+                imgSlide.css('left',0);
+                dotLi.removeClass('on').eq(0).addClass('on');
+            }else{
+                leftValue=leftValue-liWidth;
+                imgSlide.css('left',leftValue);
+                $('.dot li.on').removeClass('on').next().addClass('on');
+            }
+
+        };
+        var prevFn = function () {
+            var leftValue2 = imgSlide.offset().left;
+            if(leftValue2>=0){
+                leftValue2 = -(dotLi.length-1)*liWidth;
+                imgSlide.css('left',leftValue2);
+                dotLi.removeClass('on').last().addClass('on');
+            }else{
+                leftValue2=leftValue2+liWidth;
+                imgSlide.css('left',leftValue2);
+                $('.dot li.on').removeClass('on').prev().addClass('on');
+            }
+
+        };
+        next.bind('click',nextFn);
+        prev.bind('click',prevFn);//next and prev
+
+        liEach.swipe({
+            swipeLeft: nextFn,
+            swipeRight: prevFn
+        });//swipe on mobile
+
+    };
+
+
+})
+</script>
+</body>
+</html>
