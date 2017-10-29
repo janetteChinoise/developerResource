@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>省市联动 select</title>
+    <script src="js/jquery.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="demo">
+    <select id="proList">
+    </select>
+    <select id="cityList">
+    </select>
+    <select id="dealerList">
+    </select>
+</div>
+<script src="js/310dealer.js"></script>
+<script>
+/*function defined*/
+var proNames=function(){
+    var str='';
+    var i;
+    for(i in provinceData){
+        str+='<option value="'+ provinceData[i].proid +'">'+provinceData[i].proname+'</option>';
+    }
+    return str;
+};
+
+var cityNames=function(index){
+    var str='';
+    var i;
+    for(i in cityData){
+        if(cityData[i].proID==index){
+            str+='<option value="'+ cityData[i].cityID +'">'+cityData[i].cityName+'</option>';
+        }
+    }
+    return str;
+};
+
+var dealerNames = function(proid,cityid){
+    var dealstr='';
+    var i;
+    for(i in dealersData){
+        if(dealersData[i].province==proid && dealersData[i].city==cityid){
+            dealstr+='<option value="'+ dealersData[i].dealerCode +'">'+dealersData[i].company+'</option>';
+        }
+    }
+    return dealstr;
+};
+
+/*change select*/
+$('#proList').change(function(){
+    $('#cityList').html(cityNames($(this).val()));
+    var proid=$(this).val();
+    var cityid=$('#cityList').val();
+    $('#dealerList').html(dealerNames(proid,cityid));
+});
+
+$('#cityList').change(function(){
+    var proid=$('#proList').val();
+    var cityid=$(this).val();
+    $('#dealerList').html(dealerNames(proid,cityid));
+});
+
+/*initial*/
+$('#proList').html(proNames);
+$('#cityList').html(cityNames('1'));
+$('#dealerList').html(dealerNames('1','1'));
+</script>
+</body>
+</html>

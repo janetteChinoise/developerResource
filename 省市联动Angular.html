@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>省市联动Angular</title>
+    <script src="js/angular.min.js"></script>
+    <script src="js/310dealer.js"></script>
+    <style>
+
+    </style>
+</head>
+<body ng-app="myApp" ng-controller="formCtrl">
+<div class="demo">
+    <select ng-change="getId(getid)" ng-model="getid">
+        <option value="">选择省</option>
+        <option ng-repeat="x in provinceData" value="{{x.proid}}">{{x.proname}}</option>
+    </select>
+    <select ng-change="getCid(getid2)" ng-model="getid2">
+        <option value="">选择市</option>
+        <option ng-repeat="x in cityData" value="{{x.cityID}}" ng-if="x.proID==pid">{{x.cityName}}</option>
+    </select>
+    <select ng-model="getid3">
+        <option value="">选择经销商</option>
+        <option ng-repeat="x in dealersData" value="{{x.dealerCode}}" ng-if="x.province==pid && x.city==cid">{{x.company}}</option>
+    </select>
+</div>
+
+<script>
+var app=angular.module('myApp',[]);
+app.controller('formCtrl',function($scope){
+    $scope.provinceData=provinceData;
+    $scope.cityData=cityData;
+    $scope.dealersData=dealersData;
+
+
+    $scope.getId=function(index){
+        $scope.pid=index;
+    };
+    $scope.getCid=function(index){
+        $scope.cid=index;
+    };
+
+});
+
+</script>
+</body>
+</html>
